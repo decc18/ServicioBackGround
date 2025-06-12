@@ -55,6 +55,10 @@ namespace ServicioBackground.DTO
         [JsonProperty("productos")]
         public List<Producto> Productos { get; set; }
 
+        [JsonProperty("cp")]
+        public string CodigoPostal { get; set; }
+
+
         [JsonIgnore]
         public int Reintento { get; set; }
 
@@ -93,7 +97,7 @@ namespace ServicioBackground.DTO
         public string UnidadMedida { get; set; }
 
         [JsonProperty("clave_producto")]
-        public long ClaveProducto { get; set; }
+        public string ClaveProducto { get; set; }
 
         [JsonProperty("iva_factor")]
         public double IvaFactor { get; set; }

@@ -53,7 +53,6 @@ namespace ServicioBackground.Data
         {
             try
             {
-                _logger.Info("Ejecución: sp_consultar_tickets_por_estado");
                 string cadenaConexion = _configuration.GetValue("ServicioBackground:CadenaConexion", "");
                 var connection = new MySqlConnection(cadenaConexion);
 
@@ -67,12 +66,9 @@ namespace ServicioBackground.Data
                 );
                 
                 if(tickets == null || !tickets.Any())
-                {
-                    _logger.Info("No se encontraron transacciones pendientes.");
                     return new List<Ticket>();
-                }
-
-                if(tickets.Any())
+                
+                if (tickets.Any())
                 {
                     foreach (var ticket in tickets)
                     {
@@ -159,7 +155,6 @@ namespace ServicioBackground.Data
         {
             try
             {
-                _logger.Info("Ejecución: sp_consultar_tickets_por_estado");
                 int reintentos = _configuration.GetValue("ServicioBackground:ReintentosEnvio", 5);
                 string cadenaConexion = _configuration.GetValue("ServicioBackground:CadenaConexion", "");
                 var connection = new MySqlConnection(cadenaConexion);
@@ -174,11 +169,7 @@ namespace ServicioBackground.Data
                 );
 
                 if (logsEnvio == null || !logsEnvio.Any())
-                {
-                    _logger.Info("No se encontraron transacciones pendientes.");
                     return new List<DtoReintentos>();
-                }
-
 
                 return logsEnvio.ToList();
             }

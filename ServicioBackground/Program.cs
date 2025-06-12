@@ -6,12 +6,17 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseWindowsService();
+
 // Crear carpeta de logs si no existe
 var logDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
 if (!Directory.Exists(logDirectory))
 {
     Directory.CreateDirectory(logDirectory);
 }
+
+// Configura puerto
+builder.WebHost.UseUrls("http://localhost:8019");
 
 // Add NLog
 builder.Logging.ClearProviders(); // Elimina otros providers de logging
@@ -39,14 +44,8 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger(options => options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi2_0);
-    app.UseSwaggerUI();
-}
-
-
-app.UseHttpsRedirection();
+app.UseSwagger(options => options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi2_0);
+app.UseSwaggerUI();
 
 app.UseAuthorization();
 

@@ -29,6 +29,7 @@ namespace ServicioBackground.BackgroundWorker
         {
             _logger.Info("PosBackgroundService iniciado.");
             int enviarPendientesCada = _configuration.GetValue("ServicioBackground:EnviarPendientesCada", 5);
+            string codigoPostal = _configuration.GetValue("ServicioBackground:CodigoPostalTienda", "01120");
             var ticketPendiente = new TicketsPendientes();
             Tuple<bool, string> respuesta = new Tuple<bool, string>(false, string.Empty);
 
@@ -40,6 +41,7 @@ namespace ServicioBackground.BackgroundWorker
                     foreach (Ticket ticket in tickets)
                     {
                         ticketPendiente = new TicketsPendientes();
+                        ticket.CodigoPostal = codigoPostal;
                         ticketPendiente.Tickets.Add(ticket);
                         respuesta = await _transaccionRepository.EnviarTicketPendientes(ticketPendiente);
                     }

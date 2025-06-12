@@ -24,12 +24,9 @@ namespace ServicioBackground.Logging
             logger.Warn(message);
         }
 
-        public void Error(string message, Exception ex = null)
+        public void Error(string message, Exception ex)
         {
-            if (ex != null)
-                logger.Error(ex, message);
-            else
-                logger.Error(message);
+            logger.Error(ex, message);
         }
 
         public void Debug(string message)
