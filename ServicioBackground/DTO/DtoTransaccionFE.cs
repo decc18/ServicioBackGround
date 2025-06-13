@@ -17,7 +17,7 @@ namespace ServicioBackground.DTO
     public partial class Ticket
     {
         [JsonIgnore]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [JsonProperty("no_ticket")]
         public string NoTicket { get; set; }
@@ -73,10 +73,10 @@ namespace ServicioBackground.DTO
     public partial class Producto
     {
         [JsonIgnore]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [JsonIgnore]
-        public int TicketId { get; set; }
+        public long TicketId { get; set; }
 
         [JsonProperty("descripcion")]
         public string Descripcion { get; set; }
@@ -85,10 +85,10 @@ namespace ServicioBackground.DTO
         public double ValorUnitario { get; set; }
 
         [JsonProperty("importe")]
-        public long Importe { get; set; }
+        public double Importe { get; set; }
 
         [JsonProperty("cantidad")]
-        public long Cantidad { get; set; }
+        public int Cantidad { get; set; }
 
         [JsonProperty("clave_unidad")]
         public string ClaveUnidad { get; set; }
@@ -103,16 +103,16 @@ namespace ServicioBackground.DTO
         public double IvaFactor { get; set; }
 
         [JsonProperty("ieps_factor")]
-        public long IepsFactor { get; set; }
+        public double IepsFactor { get; set; }
 
         [JsonProperty("iva")]
         public double Iva { get; set; }
 
         [JsonProperty("ieps")]
-        public long Ieps { get; set; }
+        public double Ieps { get; set; }
 
         [JsonProperty("descuento")]
-        public long Descuento { get; set; }
+        public double Descuento { get; set; }
 
         [JsonProperty("objeto_imp")]
         public string ObjetoImp { get; set; }

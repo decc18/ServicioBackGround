@@ -73,7 +73,7 @@ namespace ServicioBackground.Data
                     foreach (var ticket in tickets)
                     {
                         var parametrosProducto = new DynamicParameters();
-                        parametrosProducto.Add("p_ticket_id", (int)ticket.Id, DbType.Int32);
+                        parametrosProducto.Add("p_ticket_id", ticket.Id, DbType.Int64);
 
                         var productosBDD = await connection.QueryAsync<Producto>(
                             "sp_consultar_productos_ticket",
@@ -126,7 +126,7 @@ namespace ServicioBackground.Data
                     foreach (var ticket in tickets)
                     {
                         var parametrosProducto = new DynamicParameters();
-                        parametrosProducto.Add("p_ticket_id", (int)ticket.Id, DbType.Int32);
+                        parametrosProducto.Add("p_ticket_id", ticket.Id, DbType.Int64);
 
                         var productosBDD = await connection.QueryAsync<Producto>(
                             "sp_consultar_productos_ticket",
@@ -223,36 +223,45 @@ namespace ServicioBackground.Data
 
         public async Task ActualizarEstadoTicket(Tuple<bool, string> respuesta, Ticket ticket)
         {
-            string mensaje = string.Empty;  
-            if (respuesta.Item1)
+            try
             {
-                mensaje = $"Ticket {ticket.NoTicket} enviado correctamente.";
-                _logger.Info(mensaje);
-                ticket.EstadoEnvio = EnumEstado.Enviado;
-                ticket.RespuestaServicio = "OK";
+                string mensaje = string.Empty;
+                if (respuesta.Item1)
+                {
+                    mensaje = $"Ticket {ticket.NoTicket} enviado correctamente.";
+                    _logger.Info(mensaje);
+                    ticket.EstadoEnvio = EnumEstado.Enviado;
+                    ticket.RespuestaServicio = "OK";
+                }
+                else
+                {
+                    mensaje = $"Error al enviar el ticket {ticket.NoTicket}: {respuesta.Item2}";
+                    _logger.Error(mensaje);
+                    ticket.EstadoEnvio = EnumEstado.Error;
+                    ticket.RespuestaServicio = mensaje;
+                }
+
+                string cadenaConexion = _configuration.GetValue("ServicioBackground:CadenaConexion", "");
+                var connection = new MySqlConnection(cadenaConexion);
+
+                var parametros = new DynamicParameters();
+                parametros.Add("p_id", ticket.Id, DbType.Int64);
+                parametros.Add("p_respuesta_servicio", mensaje, DbType.String);
+                parametros.Add("p_estado_envio", (int)ticket.EstadoEnvio, DbType.Int32);
+
+                var tickets = await connection.QueryAsync<Ticket>(
+                    "sp_actualizar_respuesta_servicio",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
             }
-            else
+            catch (Exception ex)
             {
-                mensaje = $"Error al enviar el ticket {ticket.NoTicket}: {respuesta.Item2}";
-                _logger.Error(mensaje);
-                ticket.EstadoEnvio = EnumEstado.Error;
-                ticket.RespuestaServicio = mensaje;
+                _logger.Error("Ejecución: sp_actualizar_respuesta_servicio", ex);
+                throw;
             }
-
-            string cadenaConexion = _configuration.GetValue("ServicioBackground:CadenaConexion", "");
-            var connection = new MySqlConnection(cadenaConexion);
-
-            var parametros = new DynamicParameters();
-            parametros.Add("p_id", ticket.Id, DbType.Int32);
-            parametros.Add("p_respuesta_servicio", mensaje, DbType.String);
-            parametros.Add("p_estado_envio", (int)ticket.EstadoEnvio, DbType.Int32);
-
-            var tickets = await connection.QueryAsync<Ticket>(
-                "sp_actualizar_respuesta_servicio",
-                parametros,
-                commandType: CommandType.StoredProcedure
-            );
-
+            
         }
 
         public async Task InsertarLogTicket(Ticket ticket, Tuple<bool, string> respuesta,string tramaEnviada, int reintentos)
@@ -264,7 +273,7 @@ namespace ServicioBackground.Data
                 var connection = new MySqlConnection(cadenaConexion);
 
                 var parametros = new DynamicParameters();
-                parametros.Add("p_ticket_id", ticket.Id, DbType.Int32);
+                parametros.Add("p_ticket_id", ticket.Id, DbType.Int64);
                 parametros.Add("p_trama_enviada", tramaEnviada, DbType.String);
                 parametros.Add("p_respuesta_api", respuesta.Item2, DbType.String);
                 parametros.Add("p_numero_reintentos", reintentos, DbType.Int32);

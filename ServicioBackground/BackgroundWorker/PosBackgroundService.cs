@@ -29,10 +29,8 @@ namespace ServicioBackground.BackgroundWorker
         {
             _logger.Info("PosBackgroundService iniciado.");
             int enviarPendientesCada = _configuration.GetValue("ServicioBackground:EnviarPendientesCada", 5);
-            string codigoPostal = _configuration.GetValue("ServicioBackground:CodigoPostalTienda", "01120");
             var ticketPendiente = new TicketsPendientes();
             Tuple<bool, string> respuesta = new Tuple<bool, string>(false, string.Empty);
-
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -41,9 +39,15 @@ namespace ServicioBackground.BackgroundWorker
                     foreach (Ticket ticket in tickets)
                     {
                         ticketPendiente = new TicketsPendientes();
-                        ticket.CodigoPostal = codigoPostal;
                         ticketPendiente.Tickets.Add(ticket);
-                        respuesta = await _transaccionRepository.EnviarTicketPendientes(ticketPendiente);
+                        try
+                        {
+                            respuesta = await _transaccionRepository.EnviarTicketPendientes(ticketPendiente);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error("Error en envio de trama:", ex);
+                        }
                     }
                 }
                 catch (Exception ex)

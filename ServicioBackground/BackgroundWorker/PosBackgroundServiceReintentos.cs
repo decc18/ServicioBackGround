@@ -30,9 +30,9 @@ namespace ServicioBackground.BackgroundWorker
         {
             _logger.Info("PosBackgroundServiceReintentos iniciado.");
             int enviarPendientesCada = _configuration.GetValue("ServicioBackground:EnviarReintentosPendientesCada", 5);
-            string codigoPostal = _configuration.GetValue("ServicioBackground:CodigoPostalTienda", "01120");
             var ticketPendiente = new TicketsPendientes();
             Tuple<bool, string> respuesta = new Tuple<bool, string>(false, string.Empty);
+            await Task.Delay(enviarPendientesCada * 60000);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -42,7 +42,6 @@ namespace ServicioBackground.BackgroundWorker
                     foreach (var item in ticketsReintentos)
                     {
                         Ticket ticket = await _transaccionRepository.ConsultarTicketPendiente(item.IdTicket);
-                        ticket.CodigoPostal = codigoPostal;
                         ticket.Reintento = item.NumeroReintentos+1;
                         ticketPendiente = new TicketsPendientes();
                         ticketPendiente.Tickets.Add(ticket);
